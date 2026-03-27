@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo Bank Loan Agreement</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+
+  <style>
+    body {
+      font-family: "Times New Roman", serif;
+      padding: 20px;
+      background: #f4f6f8;
+    }
+
+    input {
+      margin: 5px;
+      padding: 8px;
+      width: 250px;
+    }
+
+    .agreement {
+      background: white;
+      padding: 35px;
+      margin-top: 20px;
+      border: 2px solid #000;
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .section {
+      margin-top: 15px;
+    }
+
+    .signature-box {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+    }
+
+    canvas {
+      border: 1px solid #000;
+      width: 280px;
+      height: 120px;
+    }
+
+    .bank-stamp {
+      border: 2px dashed #000;
+      padding: 10px;
+      text-align: center;
+      width: 180px;
+      font-weight: bold;
+      color: darkgreen;
+    }
+
+    .small {
+      font-size: 12px;
+      color: gray;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+    }
+
+    ul {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Demo Bank Loan Processing System</h2>
+
+<!-- INPUT -->
+<div>
+  <input type="text" id="loanId" placeholder="Loan ID (e.g. LN1001)">
+  <input type="text" id="name" placeholder="Applicant Name">
+  <input type="text" id="amount" placeholder="Loan Amount">
+  <input type="text" id="rate" placeholder="Interest Rate (%)">
+  <input type="text" id="term" placeholder="Loan Term (Years)">
+  <input type="text" id="loanType" placeholder="Loan Type (Personal / Auto / Home)">
+</div>
+
+<button onclick="clearSignature()">Clear Signature</button>
+<button onclick="generatePDF()">Generate Loan Agreement PDF</button>
+
+<!-- PDF CONTENT -->
+<div id="pdfContent" class="agreement">
+
+  <div class="header">
+    <h2>🏦 DEMO BANK</h2>
+    <div class="small">Loan Operations & Credit Division</div>
+    <div class="title">LOAN APPROVAL AGREEMENT</div>
+
+    <div class="small">
+      Loan ID: <span id="pLoanId"></span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>1. Borrower Information</h3>
+    <p><b>Full Name:</b> <span id="pName"></span></p>
+  </div>
+
+  <div class="section">
+    <h3>2. Loan Summary</h3>
+    <p><b>Approved Loan Amount:</b> $<span id="pAmount"></span></p>
+    <p><b>Interest Rate:</b> <span id="pRate"></span>% per annum</p>
+    <p><b>Loan Term:</b> <span id="pTerm"></span> years</p>
+    <p><b>Loan Type:</b> <span id="pLoanType"></span></p>
+  </div>
+
+  <div class="section">
+    <h3>3. Repayment Structure</h3>
+    <ul>
+      <li>Monthly EMI will be auto-debited from registered account.</li>
+      <li>Repayment schedule will be shared separately via email.</li>
+      <li>Prepayment allowed with applicable bank charges.</li>
+      <li>Late payment penalty may apply as per policy.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h3>4. Credit & Compliance Confirmation</h3>
+    <ul>
+      <li>Credit bureau check completed successfully.</li>
+      <li>OFAC / compliance screening passed.</li>
+      <li>Customer verified in core banking system.</li>
+      <li>Loan eligibility validated by automated decision engine.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h3>5. Terms & Conditions</h3>
+    <ul>
+      <li>This loan is issued based on current financial assessment.</li>
+      <li>Bank reserves right to modify terms in case of default risk.</li>
+      <li>Misrepresentation of data may lead to cancellation.</li>
+      <li>This agreement becomes active upon borrower signature.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h3>6. Borrower Declaration</h3>
+    <p>
+      I hereby confirm that all information provided is accurate and I agree to the
+      terms and conditions of this loan agreement issued by Demo Bank.
+    </p>
+  </div>
+
+  <!-- SIGNATURE -->
+  <div class="signature-box">
+
+    <div>
+      <p><b>Borrower Signature</b></p>
+      <canvas id="signaturePad"></canvas>
+    </div>
+
+    <div>
+      <p><b>Bank Authorization</b></p>
+      <div class="bank-stamp">
+        DEMO BANK<br>
+        LOAN APPROVED<br>
+        OFFICIAL SEAL
+      </div>
+      <p class="small">Authorized Loan Officer</p>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+let canvas = document.getElementById("signaturePad");
+let signaturePad = new SignaturePad(canvas);
+
+function clearSignature() {
+  signaturePad.clear();
+}
+
+function generatePDF() {
+
+    document.getElementById("pLoanId").innerText =
+      document.getElementById("loanId").value;
+
+    document.getElementById("pName").innerText =
+      document.getElementById("name").value;
+
+    document.getElementById("pAmount").innerText =
+      document.getElementById("amount").value;
+
+    document.getElementById("pRate").innerText =
+      document.getElementById("rate").value;
+
+    document.getElementById("pTerm").innerText =
+      document.getElementById("term").value;
+
+    document.getElementById("pLoanType").innerText =
+      document.getElementById("loanType").value;
+
+    if (!signaturePad.isEmpty()) {
+      let sigImg = signaturePad.toDataURL();
+      let img = document.createElement("img");
+      img.src = sigImg;
+      img.style.width = "280px";
+      canvas.replaceWith(img);
+    }
+
+    html2pdf()
+      .from(document.getElementById("pdfContent"))
+      .set({
+          margin: 12,
+          filename: 'DemoBank_Loan_Agreement.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      })
+      .save();
+}
+</script>
+
+</body>
+</html>
